@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="前端性能优化、图片懒加载," />
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="前端知识记录与学习，欢迎大家指正">
+<meta name="description" content="通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的">
+<meta name="keywords" content="前端性能优化、图片懒加载">
 <meta property="og:type" content="article">
 <meta property="og:title" content="js原生实现图片懒加载">
 <meta property="og:url" content="http://Jeckhenry.github.io/2018/06/22/js原生实现图片懒加载/index.html">
 <meta property="og:site_name" content="Jeckhenry的博客">
-<meta property="og:description" content="前端知识记录与学习，欢迎大家指正">
+<meta property="og:description" content="通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-22T01:36:37.256Z">
+<meta property="og:updated_time" content="2018-06-22T02:09:17.472Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="js原生实现图片懒加载">
-<meta name="twitter:description" content="前端知识记录与学习，欢迎大家指正">
+<meta name="twitter:description" content="通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的">
 
 
 
@@ -285,6 +286,10 @@
           
 
           
+              <div class="post-description">
+                  通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的
+              </div>
+          
 
         </div>
       </header>
@@ -299,7 +304,74 @@
       
 
       
-        
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset.src取得图片地址，<br>生成img标签并追加到页面上。</p>
+<pre><code>贴出css样式
+*{margin:0;padding:0;}
+ul{overflow:hidden;}
+li{list-style:none;width:10rem;height:12rem;border:1px solid #ccc;box-sizing:border-box;-webkit-box-sizing:border-box;overflow:hidden;position:relative;}
+li i{width:20px;height:20px;border-radius:20px;position:absolute;border:2px solid #6feb95;z-index:0;left:50%;top:50%;margin-top:-11px;margin-left:-11px;animation:move 1s infinite;-webkit-animation:move 1s infinite;}
+li i:before{position:absolute;width:5px;height:5px;border-radius:4px;content:&apos;&apos;;box-shadow:0 0 10px #666;-webkit-box-shadow:0 0 10px #666;background:#fff;border:1px solid #fff;top:-3px;left:50%;margin-left:-3px;}
+img{vertical-align:middle;border-width:0;width:100%;position:relative;z-index:1;}
+@keyframes move{
+    0%{
+        transform:rotateZ(0);
+    }
+    100%{
+        transform:rotateZ(360deg);
+    }
+}
+@-webkit-keyframes move{
+    0%{
+        -webkit-transform:rotateZ(0);
+    }
+    100%{
+        -webkit-transform:rotateZ(360deg);
+    }
+}
+
+创建img标签，并把data-src值置于img的src属性；
+// 创建img标签
+function createImg(obj){ 
+    var src = &apos;&apos;;
+    if(obj.dataset.src){
+        src = obj.dataset.src;
+    }else{
+        src = obj.getAttribute(&apos;data-src&apos;);
+    }
+    if(obj.children.length&lt;=1){
+        var img = document.createElement(&apos;img&apos;);
+        img.src = src;
+        obj.appendChild(img)
+    }
+}
+
+
+获取元素到文档顶端的距离
+//计算节点到文档顶部的距离
+function getTop(obj){
+    var h = 0;
+    while(obj){
+        h+=obj.offsetTop;
+        obj = obj.offsetParent;
+    }
+    return h;
+}
+
+//滚动时实时计算滚动区域并进行相关运算
+window.onscroll = function(){
+    var t = document.documentElement.clientHeight + (document.body.scrollTop || document.documentElement.scrollTop);
+    for(var i=0;i&lt;oLI.length;i++){
+        if(getTop(oLI[i]) &lt; t){
+            setTimeout(&apos;createImg(oLI[&apos;+i+&apos;])&apos;,1000);
+        }
+    }
+}
+
+页面加载完成后添加滚动监听
+window.onload = function(){
+    window.onscroll();
+}
+</code></pre>
       
     </div>
     
@@ -313,6 +385,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/前端性能优化、图片懒加载/" rel="tag"># 前端性能优化、图片懒加载</a>
+          
+        </div>
       
 
       
@@ -407,6 +485,15 @@
 
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
             
 
           </nav>
