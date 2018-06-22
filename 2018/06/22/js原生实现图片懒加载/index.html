@@ -87,7 +87,7 @@
 <meta property="og:site_name" content="Jeckhenry的博客">
 <meta property="og:description" content="通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-06-22T02:09:17.472Z">
+<meta property="og:updated_time" content="2018-06-22T02:18:43.915Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="js原生实现图片懒加载">
 <meta name="twitter:description" content="通过监听元素是否出现在可视区域内来加载图片，以达到优化性能的目的">
@@ -304,74 +304,12 @@
       
 
       
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset.src取得图片地址，<br>生成img标签并追加到页面上。</p>
-<pre><code>贴出css样式
-*{margin:0;padding:0;}
-ul{overflow:hidden;}
-li{list-style:none;width:10rem;height:12rem;border:1px solid #ccc;box-sizing:border-box;-webkit-box-sizing:border-box;overflow:hidden;position:relative;}
-li i{width:20px;height:20px;border-radius:20px;position:absolute;border:2px solid #6feb95;z-index:0;left:50%;top:50%;margin-top:-11px;margin-left:-11px;animation:move 1s infinite;-webkit-animation:move 1s infinite;}
-li i:before{position:absolute;width:5px;height:5px;border-radius:4px;content:&apos;&apos;;box-shadow:0 0 10px #666;-webkit-box-shadow:0 0 10px #666;background:#fff;border:1px solid #fff;top:-3px;left:50%;margin-left:-3px;}
-img{vertical-align:middle;border-width:0;width:100%;position:relative;z-index:1;}
-@keyframes move{
-    0%{
-        transform:rotateZ(0);
-    }
-    100%{
-        transform:rotateZ(360deg);
-    }
-}
-@-webkit-keyframes move{
-    0%{
-        -webkit-transform:rotateZ(0);
-    }
-    100%{
-        -webkit-transform:rotateZ(360deg);
-    }
-}
-
-创建img标签，并把data-src值置于img的src属性；
-// 创建img标签
-function createImg(obj){ 
-    var src = &apos;&apos;;
-    if(obj.dataset.src){
-        src = obj.dataset.src;
-    }else{
-        src = obj.getAttribute(&apos;data-src&apos;);
-    }
-    if(obj.children.length&lt;=1){
-        var img = document.createElement(&apos;img&apos;);
-        img.src = src;
-        obj.appendChild(img)
-    }
-}
-
-
-获取元素到文档顶端的距离
-//计算节点到文档顶部的距离
-function getTop(obj){
-    var h = 0;
-    while(obj){
-        h+=obj.offsetTop;
-        obj = obj.offsetParent;
-    }
-    return h;
-}
-
-//滚动时实时计算滚动区域并进行相关运算
-window.onscroll = function(){
-    var t = document.documentElement.clientHeight + (document.body.scrollTop || document.documentElement.scrollTop);
-    for(var i=0;i&lt;oLI.length;i++){
-        if(getTop(oLI[i]) &lt; t){
-            setTimeout(&apos;createImg(oLI[&apos;+i+&apos;])&apos;,1000);
-        }
-    }
-}
-
-页面加载完成后添加滚动监听
-window.onload = function(){
-    window.onscroll();
-}
-</code></pre>
+        <h2 id="实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset-src取得图片地址，生成img标签并追加到页面上。"><a href="#实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset-src取得图片地址，生成img标签并追加到页面上。" class="headerlink" title="实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset.src取得图片地址，生成img标签并追加到页面上。"></a>实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset.src取得图片地址，生成img标签并追加到页面上。</h2><h2 id="贴出css样式"><a href="#贴出css样式" class="headerlink" title="贴出css样式"></a>贴出css样式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">*&#123;margin:0;padding:0;&#125;</span><br><span class="line">   ul&#123;overflow:hidden;&#125;</span><br><span class="line">   li&#123;list-style:none;width:10rem;height:12rem;border:1px solid #ccc;box-sizing:border-box;-webkit-box-sizing:border-box;overflow:hidden;position:relative;&#125;</span><br><span class="line">   li i&#123;width:20px;height:20px;border-radius:20px;position:absolute;border:2px solid #6feb95;z-index:0;left:50%;top:50%;margin-top:-11px;margin-left:-11px;animation:move 1s infinite;-webkit-animation:move 1s infinite;&#125;</span><br><span class="line">   li i:before&#123;position:absolute;width:5px;height:5px;border-radius:4px;content:&apos;&apos;;box-shadow:0 0 10px #666;-webkit-box-shadow:0 0 10px #666;background:#fff;border:1px solid #fff;top:-3px;left:50%;margin-left:-3px;&#125;</span><br><span class="line">   img&#123;vertical-align:middle;border-width:0;width:100%;position:relative;z-index:1;&#125;</span><br><span class="line">   @keyframes move&#123;</span><br><span class="line">   	0%&#123;</span><br><span class="line">   		transform:rotateZ(0);</span><br><span class="line">   	&#125;</span><br><span class="line">   	100%&#123;</span><br><span class="line">   		transform:rotateZ(360deg);</span><br><span class="line">   	&#125;</span><br><span class="line">   &#125;</span><br><span class="line">   @-webkit-keyframes move&#123;</span><br><span class="line">   	0%&#123;</span><br><span class="line">   		-webkit-transform:rotateZ(0);</span><br><span class="line">   	&#125;</span><br><span class="line">   	100%&#123;</span><br><span class="line">   		-webkit-transform:rotateZ(360deg);</span><br><span class="line">   	&#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="创建img标签，并把data-src值置于img的src属性；"><a href="#创建img标签，并把data-src值置于img的src属性；" class="headerlink" title="创建img标签，并把data-src值置于img的src属性；"></a>创建img标签，并把data-src值置于img的src属性；</h2><pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 创建img标签</span><br><span class="line">function createImg(obj)&#123; </span><br><span class="line">	var src = &apos;&apos;;</span><br><span class="line">	if(obj.dataset.src)&#123;</span><br><span class="line">		src = obj.dataset.src;</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		src = obj.getAttribute(&apos;data-src&apos;);</span><br><span class="line">	&#125;</span><br><span class="line">	if(obj.children.length&lt;=1)&#123;</span><br><span class="line">		var img = document.createElement(&apos;img&apos;);</span><br><span class="line">		img.src = src;</span><br><span class="line">		obj.appendChild(img)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre><h2 id="获取元素到文档顶端的距离"><a href="#获取元素到文档顶端的距离" class="headerlink" title="获取元素到文档顶端的距离"></a>获取元素到文档顶端的距离</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">//计算节点到文档顶部的距离</span><br><span class="line">function getTop(obj)&#123;</span><br><span class="line">	var h = 0;</span><br><span class="line">	while(obj)&#123;</span><br><span class="line">		h+=obj.offsetTop;</span><br><span class="line">		obj = obj.offsetParent;</span><br><span class="line">	&#125;</span><br><span class="line">	return h;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="滚动时实时计算滚动区域并进行相关运算"><a href="#滚动时实时计算滚动区域并进行相关运算" class="headerlink" title="//滚动时实时计算滚动区域并进行相关运算"></a>//滚动时实时计算滚动区域并进行相关运算</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">window.onscroll = function()&#123;</span><br><span class="line">	var t = document.documentElement.clientHeight + (document.body.scrollTop || document.documentElement.scrollTop);</span><br><span class="line">	for(var i=0;i&lt;oLI.length;i++)&#123;</span><br><span class="line">		if(getTop(oLI[i]) &lt; t)&#123;</span><br><span class="line">			setTimeout(&apos;createImg(oLI[&apos;+i+&apos;])&apos;,1000);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="页面加载完成后添加滚动监听"><a href="#页面加载完成后添加滚动监听" class="headerlink" title="页面加载完成后添加滚动监听"></a>页面加载完成后添加滚动监听</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">window.onload = function()&#123;</span><br><span class="line">	window.onscroll();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。"><a href="#如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。" class="headerlink" title="如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。"></a>如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。</h3>
       
     </div>
     
@@ -461,8 +399,17 @@ window.onload = function(){
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -513,6 +460,22 @@ window.onload = function(){
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset-src取得图片地址，生成img标签并追加到页面上。"><span class="nav-number">1.</span> <span class="nav-text">实现思路，首先将图片地址置于data-sc属性中，初始时不加载图片。添加全局监听器，当元素出现在可视区域内时，通过getAttribute、dataset.src取得图片地址，生成img标签并追加到页面上。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#贴出css样式"><span class="nav-number">2.</span> <span class="nav-text">贴出css样式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建img标签，并把data-src值置于img的src属性；"><span class="nav-number">3.</span> <span class="nav-text">创建img标签，并把data-src值置于img的src属性；</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取元素到文档顶端的距离"><span class="nav-number">4.</span> <span class="nav-text">获取元素到文档顶端的距离</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#滚动时实时计算滚动区域并进行相关运算"><span class="nav-number">5.</span> <span class="nav-text">//滚动时实时计算滚动区域并进行相关运算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#页面加载完成后添加滚动监听"><span class="nav-number">6.</span> <span class="nav-text">页面加载完成后添加滚动监听</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。"><span class="nav-number">6.1.</span> <span class="nav-text">如果大家又更好的思路，可以联系我哦，共同进步！我的QQ：571977485，欢迎骚扰。</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
